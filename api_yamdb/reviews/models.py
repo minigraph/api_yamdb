@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 
 
 class Category(models.Model):
@@ -121,3 +122,43 @@ class GenresOfTitles(models.Model):
 
     def __str__(self):
         return f':Жанр {self.genre} произведения {self.title}'
+
+
+class Review(models.Model):
+    author = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
+    score = models.IntegerField(
+        'Оценка',
+        help_text='Оценка произведения'
+    )
+    text = models.TextField(
+        'Текст',
+        help_text='Текст отзыва'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведение',
+        help_text='Произведение',
+    )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_review'
+            )
+        ]
+
+    def __str__(self):
+        return self.text
