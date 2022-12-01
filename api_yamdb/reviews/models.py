@@ -71,14 +71,7 @@ class Title(models.Model):
         help_text='Описание',
     )
 
-    genre = models.ForeignKey(
-        Genre,
-        null=False,
-        on_delete=models.DO_NOTHING,
-        related_name='genres',
-        help_text='Жанр',
-        verbose_name='Жанр',
-    )
+    genre = models.ManyToManyField(Genre, through='GenresOfTitles')
 
     category = models.ForeignKey(
         Category,
