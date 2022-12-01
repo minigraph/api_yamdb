@@ -135,10 +135,29 @@ class GenresOfTitles(models.Model):
 
 class Review(models.Model):
     author = models.IntegerField()  # Временно
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-    score = models.IntegerField()
-    text = models.TextField()
-    title = models.IntegerField()  # Временно
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
+    score = models.IntegerField(
+        'Оценка',
+        help_text='Оценка произведения'
+    )
+    text = models.TextField(
+        'Текст',
+        help_text='Текст отзыва'
+    )
+    title = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE,
+        related_name='titles',
+        verbose_name='Произведение',
+        help_text='Произведение',
+    )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
 
     def __str__(self):
         return self.text
