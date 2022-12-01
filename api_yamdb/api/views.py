@@ -1,18 +1,25 @@
 from django.shortcuts import get_object_or_404
-from reviews.models import Review, Titles
 from rest_framework import viewsets, pagination
-from . import serializers
+from reviews.models import Review, Title
+from users.models import CustomUser
+
+from .serializers import UserSerializer, ReviewSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
 
 
 class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Review.objects.all()
-    serializer_class = serializers.ReviewSerializer
+    serializer_class = ReviewSerializer
     pagination_class = pagination.PageNumberPagination
 
     def __get_title(self):
         """Получить экземпляр Title по id из пути."""
         id = self.kwargs.get('title_id')
-        return get_object_or_404(Titles, id=id)
+        return get_object_or_404(Title, id=id)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, titles=self.__get_title())
