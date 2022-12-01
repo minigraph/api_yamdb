@@ -1,4 +1,2 @@
-# API FOR COLLECTING REVIEWS OF WORKS OF ART
-
-## Features
+# api_yamdb
 api_yamdb
