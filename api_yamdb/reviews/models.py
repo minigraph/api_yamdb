@@ -1,11 +1,8 @@
-# from django.contrib.auth import get_user_model
 from django.db import models
 
-# User = get_user_model()
 
-
-class Categories(models.Model):
-    '''Категории (типы) произведений'''
+class Category(models.Model):
+    """Категории (типы) произведений"""
 
     name = models.CharField(
         'Имя',
@@ -28,8 +25,8 @@ class Categories(models.Model):
         return self.name
 
 
-class Genres(models.Model):
-    '''Жанры'''
+class Genre(models.Model):
+    """Жанры произведений"""
 
     name = models.CharField(
         'Имя',
@@ -52,13 +49,13 @@ class Genres(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     """Произведения"""
 
     name = models.CharField(
         'Имя',
         max_length=256,
-        help_text='Произведение',
+        help_text='Название произведения',
     )
 
     year = models.DateField(
@@ -75,7 +72,7 @@ class Titles(models.Model):
     )
 
     genre = models.ForeignKey(
-        Genres,
+        Genre,
         null=False,
         on_delete=models.DO_NOTHING,
         related_name='genres',
@@ -84,7 +81,7 @@ class Titles(models.Model):
     )
 
     category = models.ForeignKey(
-        Categories,
+        Category,
         null=False,
         on_delete=models.DO_NOTHING,
         related_name='categories',
@@ -104,15 +101,15 @@ class GenresOfTitles(models.Model):
     """Жанры произведений"""
 
     title = models.ForeignKey(
-        Titles,
+        Title,
         on_delete=models.CASCADE,
         related_name='genres',
-        verbose_name='Произведения',
-        help_text='Произведения',
+        verbose_name='Произведение',
+        help_text='Произведение',
     )
 
     genre = models.ForeignKey(
-        Genres,
+        Genre,
         on_delete=models.CASCADE,
         related_name='titles',
         verbose_name='Жанр',
@@ -120,7 +117,7 @@ class GenresOfTitles(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Жанры произведения'
+        verbose_name = 'Жанр произведения'
         verbose_name_plural = 'Жанры произведения'
         ordering = ['title', 'genre']
 
