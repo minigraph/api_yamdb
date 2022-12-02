@@ -1,13 +1,11 @@
 from rest_framework import serializers, validators
 from reviews.models import Review
+from reviews.models import Title, Category, Genre, GenresOfTitles
 from users.models import CustomUser
 
 from datetime import datetime
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from django.shortcuts import get_object_or_404
-
-from reviews.models import Title, Category, Genre, GenresOfTitles
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -44,7 +42,7 @@ class GenresOfTitlesSerializer(serializers.ModelSerializer):
         model = GenresOfTitles
 
         validators = [
-            UniqueTogetherValidator(
+            validators.UniqueTogetherValidator(
                 queryset=GenresOfTitles.objects.all(),
                 fields=['genre', 'title'],
                 message='Жанр уже присвоен!'
@@ -52,7 +50,7 @@ class GenresOfTitlesSerializer(serializers.ModelSerializer):
         ]
 
 
-class TitlesSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений."""
 
     # при создании нового произведения передается список словарей жанров только

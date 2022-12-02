@@ -10,7 +10,7 @@ from rest_framework import viewsets
 from rest_framework import filters
 
 from api.serializers import CategorySerializer, GenreSerializer
-from api.serializers import TitlesSerializer
+from api.serializers import TitleSerializer
 from api.permissions import IsAdministratorOrReadinly
 from reviews.models import Category, Genre, Title
 
@@ -55,7 +55,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         IsAdministratorOrReadinly,
     ]
     queryset = Title.objects.all()
-    serializer_class = TitlesSerializer
+    serializer_class = TitleSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('category', 'name', 'year')
 
