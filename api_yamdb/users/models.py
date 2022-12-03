@@ -17,23 +17,32 @@ class CustomUser(AbstractUser):
     username = models.CharField(
         'Логин',
         max_length=150,
-        unique=True
+        unique=True,
     )
     email = models.EmailField(
         'Электронная почта',
         max_length=254,
         unique=True,
-        null=False
+        null=False,
     )
     role = models.CharField(
         'Права доступа',
         max_length=20,
-        choices=ROLES
+        choices=ROLES,
+        default=USER,
     )
     bio = models.TextField(
         'О себе',
         blank=True,
     )
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN or self.is_superuser
 
     class Meta:
         verbose_name = 'Пользователь'

@@ -1,5 +1,6 @@
 from rest_framework import serializers, validators
 from rest_framework.validators import UniqueValidator
+
 from reviews.models import Review
 from users.models import CustomUser
 
@@ -24,14 +25,14 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
-    extra_kwargs = {'confirmattion_code': {'write_only': True}}
+    extra_kwargs = {'confirmation_code': {'write_only': True}}
 
 # Запрет на использование "me" в качестве username
-    def validate_username(self, username):
-        if username == 'me':
+    def validate_username(self, value):
+        if value == 'me':
             raise serializers.ValidationError(
                 'Нельзя зарегистрировать пользователя с таким именем!')
-        return username
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
