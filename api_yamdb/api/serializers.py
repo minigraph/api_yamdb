@@ -1,6 +1,4 @@
 from rest_framework import serializers, validators
-from rest_framework.validators import UniqueValidator
-
 from reviews.models import Review
 from users.models import CustomUser
 
@@ -8,11 +6,11 @@ from users.models import CustomUser
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.SlugField(
         required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
     )
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
     )
 
     class Meta:
