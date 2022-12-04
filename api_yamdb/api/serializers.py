@@ -1,10 +1,10 @@
-from rest_framework import serializers, validators
-from reviews.models import Review, Comment
-from reviews.models import Title, Category, Genre, GenresOfTitles
-from users.models import CustomUser
-
 from datetime import datetime
+
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers, validators
+from reviews.models import (Category, Comment, Genre, GenresOfTitles, Review,
+                            Title)
+from users.models import CustomUser
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -118,11 +118,15 @@ class TitleSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.SlugField(
         required=True,
-        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[validators.UniqueValidator(
+            queryset=CustomUser.objects.all()
+        )]
     )
     email = serializers.EmailField(
         required=True,
-        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[validators.UniqueValidator(
+            queryset=CustomUser.objects.all()
+        )]
     )
 
     class Meta:
@@ -135,7 +139,9 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
-    extra_kwargs = {'confirmation_code': {'write_only': True}}
+    extra_kwargs = {
+        'confirmation_code': {'write_only': True, 'required': True}
+    }
 
 # Запрет на использование "me" в качестве username
     def validate_username(self, value):
@@ -143,6 +149,11 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя зарегистрировать пользователя с таким именем!')
         return value
+
+
+class CheckCodeSerializer(serializers.Serializer):
+    username = serializers.SlugField(required=True)
+    confirmation_code = serializers.CharField(required=True)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
