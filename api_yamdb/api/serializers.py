@@ -116,6 +116,14 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.SlugField(
+        required=True,
+        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
+    )
+    email = serializers.EmailField(
+        required=True,
+        validators=[validators.UniqueValidator(queryset=CustomUser.objects.all())]
+    )
 
     class Meta:
         model = CustomUser
@@ -127,6 +135,14 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
+    extra_kwargs = {'confirmation_code': {'write_only': True}}
+
+# Запрет на использование "me" в качестве username
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Нельзя зарегистрировать пользователя с таким именем!')
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
