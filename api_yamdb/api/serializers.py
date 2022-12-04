@@ -1,10 +1,9 @@
 from rest_framework import serializers, validators
-from reviews.models import Review
+from reviews.models import Review, Comment
 from reviews.models import Title, Category, Genre, GenresOfTitles
 from users.models import CustomUser
 
 from datetime import datetime
-from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 
@@ -138,7 +137,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        exclude = ('title',)
+        # exclude = ('title',)
+        fields = ('author', 'pub_date', 'score', 'text', 'title',)
+        read_only_fields = ('title',)
         model = Review
         validators = [
             validators.UniqueTogetherValidator(
@@ -146,3 +147,15 @@ class ReviewSerializer(serializers.ModelSerializer):
                 fields=('author', 'title')
             )
         ]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        exclude = ('review',)
+        model = Comment
