@@ -60,12 +60,10 @@ class Title(models.Model):
         help_text='Название произведения',
     )
 
-    year = models.DateField(
+    year = models.IntegerField(
         'Год выпуска',
         null=False,
-        auto_now=False,
-        auto_now_add=False,
-        help_text='Год выпуска'
+        help_text='Год создания'
     )
 
     description = models.TextField(
@@ -73,7 +71,11 @@ class Title(models.Model):
         help_text='Описание',
     )
 
-    genre = models.ManyToManyField(Genre, through='GenresOfTitles')
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenresOfTitles',
+        related_name='genre'
+    )
 
     category = models.ForeignKey(
         Category,
@@ -87,6 +89,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ['name', ]
 
     def __str__(self):
         return self.name

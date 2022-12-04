@@ -1,17 +1,67 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import pagination, viewsets
+from rest_framework import pagination, viewsets, filters
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Review, Title
+from reviews.models import Review, Title, Category, Genre
 from users.models import CustomUser
 
-from .permissions import IsAdmin
-from .serializers import ReviewSerializer, UserSerializer
+from .serializers import UserSerializer, ReviewSerializer, CommentSerializer
+from api.serializers import CategorySerializer, GenreSerializer
+from api.serializers import TitleSerializer
+from api.permissions import IsAdministratorOrReadinly
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """Вьюсет категорий."""
+
+    # Заменить на реальные классы!
+    permission_classes = [
+        IsAdministratorOrReadinly,
+    ]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+    def get_object(self):
+        return Category.objects.get(slug=self.kwargs['pk'])
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    """Вьюсет жанров произведений."""
+
+    # Заменить на реальные классы!
+    permission_classes = [
+        IsAdministratorOrReadinly,
+    ]
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+    def get_object(self):
+        return Genre.objects.get(slug=self.kwargs['pk'])
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет произведений."""
+
+    # Заменить на реальные классы!
+    permission_classes = [
+        IsAdministratorOrReadinly,
+    ]
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('category', 'name', 'year')
+
+    def get_object(self):
+        return Title.objects.get(pk=self.kwargs['pk'])
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -74,8 +124,7 @@ def get_jwt_token(request):
     return Response('Неверный код или e-mail')
 
 
-class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Review.objects.all()
+class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = pagination.PageNumberPagination
 
@@ -85,7 +134,23 @@ class ReviewViewSet(viewsets.ReadOnlyModelViewSet):
         return get_object_or_404(Title, id=id)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, titles=self.__get_title())
+        serializer.save(author=self.request.user, title=self.__get_title())
 
     def get_queryset(self):
         return self.__get_title().reviews.all()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    pagination_class = pagination.PageNumberPagination
+
+    def __get_review(self):
+        """Получить экземпляр Review по id из пути."""
+        id = self.kwargs.get('review_id')
+        return get_object_or_404(Review, id=id)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.__get_review())
+
+    def get_queryset(self):
+        return self.__get_review().comments.all()
