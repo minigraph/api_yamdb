@@ -13,7 +13,7 @@ from users.models import CustomUser
 from .serializers import UserSerializer, ReviewSerializer, CommentSerializer
 from api.serializers import CategorySerializer, GenreSerializer
 from api.serializers import TitleSerializer
-from api.permissions import IsAdministratorOrReadinly
+from api.permissions import IsAdministratorOrReadinly, IsAdmin
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
