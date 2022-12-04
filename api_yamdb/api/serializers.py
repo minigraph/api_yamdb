@@ -140,7 +140,7 @@ class UserSerializer(serializers.ModelSerializer):
             'role'
         )
     extra_kwargs = {
-        'confirmation_code': {'write_only': True, 'required': True}
+        'confirmation_code': {'write_only': True}
     }
 
 # Запрет на использование "me" в качестве username
