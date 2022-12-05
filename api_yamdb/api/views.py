@@ -14,6 +14,7 @@ from users.models import CustomUser
 
 from .serializers import (CheckCodeSerializer, CommentSerializer,
                           ReviewSerializer, UserSerializer)
+from .pagination import CustomPagination
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -128,7 +129,7 @@ def get_jwt_token(request):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = pagination.PageNumberPagination
+    pagination_class = CustomPagination
 
     def __get_title(self):
         """Получить экземпляр Title по id из пути."""

@@ -5,6 +5,7 @@ from rest_framework import serializers, validators
 from reviews.models import (Category, Comment, Genre, GenresOfTitles, Review,
                             Title)
 from users.models import CustomUser
+from django.db.models import Avg
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -65,10 +66,13 @@ class TitleSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('id', 'category', 'genre', 'name', 'description', 'year')
+        fields = (
+            'id', 'category', 'genre', 'name', 'description', 'year', 'rating'
+        )
 
     def create(self, validated_data):
 
@@ -114,6 +118,12 @@ class TitleSerializer(serializers.ModelSerializer):
                 genres.append({'name': genre.name, 'slug': genre.slug})
         return genres
 
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(result=Avg('score'))
+        if rating['result'] is None:
+            return None
+        return int(rating['result'])
+
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.SlugField(
@@ -156,17 +166,30 @@ class CheckCodeSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(required=True)
 
 
+class CurrentTitleDefault:
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        view = serializer_field.context['view']
+        return get_object_or_404(Title, id=view.kwargs['title_id'])
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
+    title = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+        default=CurrentTitleDefault()
+    )
 
     class Meta:
-        # exclude = ('title',)
-        fields = ('author', 'pub_date', 'score', 'text', 'title',)
-        read_only_fields = ('title',)
+        fields = ('id', 'author', 'pub_date', 'score', 'text', 'title')
         model = Review
         validators = [
             validators.UniqueTogetherValidator(
