@@ -14,6 +14,7 @@ from .serializers import UserSerializer, ReviewSerializer, CommentSerializer
 from api.serializers import CategorySerializer, GenreSerializer
 from api.serializers import TitleSerializer
 from api.permissions import IsAdministratorOrReadinly, IsAdmin
+from .pagination import CustomPagination
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -126,7 +127,7 @@ def get_jwt_token(request):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = pagination.PageNumberPagination
+    pagination_class = CustomPagination
 
     def __get_title(self):
         """Получить экземпляр Title по id из пути."""
