@@ -30,7 +30,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
     def get_object(self):
-        return Category.objects.get(slug=self.kwargs['pk'])
+        return get_object_or_404(Category, slug=self.kwargs['pk'])
 
 
 class GenreViewSet(viewsets.ModelViewSet):
