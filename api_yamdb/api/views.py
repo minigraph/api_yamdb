@@ -1,19 +1,19 @@
+from api.permissions import IsAdmin, IsAdministratorOrReadinly
+from api.serializers import (CategorySerializer, GenreSerializer,
+                             TitleSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import pagination, viewsets, filters
+from rest_framework import filters, pagination, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-
-from reviews.models import Review, Title, Category, Genre
+from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
-from .serializers import UserSerializer, ReviewSerializer, CommentSerializer
-from api.serializers import CategorySerializer, GenreSerializer
-from api.serializers import TitleSerializer
-from api.permissions import IsAdministratorOrReadinly, IsAdmin
+from .serializers import (CheckCodeSerializer, CommentSerializer,
+                          ReviewSerializer, UserSerializer)
 from .pagination import CustomPagination
 
 
@@ -108,21 +108,23 @@ def send_confirmation_code(request):
         recipient_list=[email],
         fail_silently=False,
     )
-    return Response({'Код подтверждения отправлен на почту': email})
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
 def get_jwt_token(request):
     """Получение и обновление токена"""
+    serializer = CheckCodeSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         CustomUser,
-        email=request.data.get('email')
+        username=request.data.get('username')
     )
     confirmation_code = request.data.get('confirmation_code')
     if default_token_generator.check_token(user, confirmation_code):
         jwt_token = AccessToken.for_user(user)
         return Response({'token': str(jwt_token)})
-    return Response('Неверный код или e-mail')
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
