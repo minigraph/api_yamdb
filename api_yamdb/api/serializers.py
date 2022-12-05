@@ -119,7 +119,10 @@ class TitleSerializer(serializers.ModelSerializer):
         return genres
 
     def get_rating(self, obj):
-        return int(obj.reviews.aggregate(Avg('score'))['score__avg'])
+        rating = obj.reviews.aggregate(result=Avg('score'))
+        if rating['result'] is None:
+            return None
+        return int(rating['result'])
 
 
 class UserSerializer(serializers.ModelSerializer):
