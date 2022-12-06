@@ -63,7 +63,7 @@ class Title(models.Model):
 
     year = models.IntegerField(
         'Год выпуска',
-        null=False,
+        null=True,
         help_text='Год создания'
     )
 
