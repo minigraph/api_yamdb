@@ -11,18 +11,14 @@ from django.db.models import Avg
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор категорий."""
 
-    slug = serializers.SlugField()
+    slug = serializers.SlugField(
+        validators=[validators.UniqueValidator(
+            queryset=Category.objects.all()
+        )])
 
     class Meta:
         model = Category
         fields = ('name', 'slug',)
-
-    def validate_slug(self, slug):
-        if Category.objects.filter(slug=slug).exists():
-            raise serializers.ValidationError(
-                'Поле slug должно быть уникальным!'
-            )
-        return slug
 
 
 class GenreSerializer(serializers.ModelSerializer):
