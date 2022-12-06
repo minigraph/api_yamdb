@@ -33,7 +33,8 @@ class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
         return get_object_or_404(Category, slug=self.kwargs['pk'])
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
+                   mixins.CreateModelMixin, mixins.ListModelMixin):
     """Вьюсет жанров произведений."""
 
     permission_classes = [
@@ -43,6 +44,9 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+
+    def get_object(self):
+        return get_object_or_404(Genre, slug=self.kwargs['pk'])
 
 
 class TitleViewSet(viewsets.ModelViewSet):
