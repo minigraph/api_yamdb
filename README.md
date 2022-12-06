@@ -182,9 +182,12 @@ Status code: 404
 [Документация ReDoc](http://127.0.0.1:8000/redoc/)
 
 ### Авторы:
-*Андрей Макарочкин
-tlg: @ e-mail: makarochkin.a.v@yandex.ru;
-*Оксана Невская
-tlg: @Luen96 e-mail: luen96@yandex.ru;
-*Михаил Никитин
-tlg: @minigraf e-mail: minigraph@yandex.ru; maikl.nikitin@yahoo.com;
+* Андрей Макарочкин
+* * tlg: @ 
+* * e-mail: makarochkin.a.v@yandex.ru;
+* Оксана Невская
+* * tlg: @Luen96 
+* * e-mail: luen96@yandex.ru;
+* Михаил Никитин
+* * tlg: @minigraf 
+* * e-mail: minigraph@yandex.ru; maikl.nikitin@yahoo.com;
