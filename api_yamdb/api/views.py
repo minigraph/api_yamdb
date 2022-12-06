@@ -1,4 +1,4 @@
-from api.permissions import IsAdmin, IsAdministratorOrReadinly
+from api.permissions import IsAdmin, AdminOrReadOnly
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleSerializer)
 from django.contrib.auth.tokens import default_token_generator
@@ -20,41 +20,32 @@ from .pagination import CustomPagination
 class CategoryViewSet(viewsets.ModelViewSet):
     """Вьюсет категорий."""
 
-    # Заменить на реальные классы!
     permission_classes = [
-        IsAdministratorOrReadinly,
+        AdminOrReadOnly,
     ]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_object(self):
-        return get_object_or_404(Category, slug=self.kwargs['pk'])
-
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Вьюсет жанров произведений."""
 
-    # Заменить на реальные классы!
     permission_classes = [
-        IsAdministratorOrReadinly,
+        AdminOrReadOnly,
     ]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_object(self):
-        return Genre.objects.get(slug=self.kwargs['pk'])
-
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет произведений."""
 
-    # Заменить на реальные классы!
     permission_classes = [
-        IsAdministratorOrReadinly,
+        AdminOrReadOnly,
     ]
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
