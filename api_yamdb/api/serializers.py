@@ -17,6 +17,13 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('name', 'slug',)
 
+    def validate_slug(self, slug):
+        if Genre.objects.filter(slug=slug).exists():
+            raise serializers.ValidationError(
+                'Поле slug должно быть уникальным!'
+            )
+        return slug
+
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор жанров"""
@@ -27,6 +34,13 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug',)
+
+    def validate_slug(self, slug):
+        if Genre.objects.filter(slug=slug).exists():
+            raise serializers.ValidationError(
+                'Поле slug должно быть уникальным!'
+            )
+        return slug
 
 
 class GenresOfTitlesSerializer(serializers.ModelSerializer):

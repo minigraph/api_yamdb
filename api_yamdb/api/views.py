@@ -28,9 +28,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_object(self):
-        return get_object_or_404(Category, slug=self.kwargs['pk'])
-
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Вьюсет жанров произведений."""
@@ -42,9 +39,6 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
-    def get_object(self):
-        return Genre.objects.get(slug=self.kwargs['pk'])
 
 
 class TitleViewSet(viewsets.ModelViewSet):
