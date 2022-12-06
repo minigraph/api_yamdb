@@ -24,19 +24,15 @@ class CategorySerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор жанров"""
 
-    slug = serializers.SlugField()
+    slug = serializers.SlugField(
+        validators=[validators.UniqueValidator(
+            queryset=Genre.objects.all()
+        )])
     name = serializers.CharField(required=False)
 
     class Meta:
         model = Genre
         fields = ('name', 'slug',)
-
-    def validate_slug(self, slug):
-        if Genre.objects.filter(slug=slug).exists():
-            raise serializers.ValidationError(
-                'Поле slug должно быть уникальным!'
-            )
-        return slug
 
 
 class GenresOfTitlesSerializer(serializers.ModelSerializer):
