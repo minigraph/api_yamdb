@@ -89,7 +89,7 @@ class TitleSerializer(serializers.ModelSerializer):
         if len(self.initial_data['genre']) == 0:
             return title
         for genre_slug in self.initial_data['genre']:
-            current_genre = get_object_or_404(Genre, slug=genre_slug)
+            current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
             title.genre.add(current_genre)
         title.save()
         return title

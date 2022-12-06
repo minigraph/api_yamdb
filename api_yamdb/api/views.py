@@ -1,4 +1,4 @@
-from api.permissions import IsAdmin, AdminOrReadOnly
+from api.permissions import IsAdmin, AdminOrReadOnly, AuthorOrStaffOrReadOnly
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleSerializer)
 from django.contrib.auth.tokens import default_token_generator
@@ -14,7 +14,6 @@ from users.models import CustomUser
 
 from .serializers import (CheckCodeSerializer, CommentSerializer,
                           ReviewSerializer, UserSerializer)
-from .pagination import CustomPagination
 
 
 class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
@@ -128,7 +127,8 @@ def get_jwt_token(request):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = CustomPagination
+    pagination_class = pagination.PageNumberPagination
+    permission_classes = (AuthorOrStaffOrReadOnly,)
 
     def __get_title(self):
         """Получить экземпляр Title по id из пути."""
@@ -145,6 +145,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = pagination.PageNumberPagination
+    permission_classes = (AuthorOrStaffOrReadOnly,)
 
     def __get_review(self):
         """Получить экземпляр Review по id из пути."""
