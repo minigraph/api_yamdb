@@ -18,7 +18,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug',)
 
     def validate_slug(self, slug):
-        if Genre.objects.filter(slug=slug).exists():
+        if Category.objects.filter(slug=slug).exists():
             raise serializers.ValidationError(
                 'Поле slug должно быть уникальным!'
             )
