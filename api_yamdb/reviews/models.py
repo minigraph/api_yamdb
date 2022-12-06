@@ -80,8 +80,8 @@ class Title(models.Model):
 
     category = models.ForeignKey(
         Category,
-        null=False,
-        on_delete=models.DO_NOTHING,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='categories',
         help_text='Категория',
         verbose_name='Категория',
