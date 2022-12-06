@@ -77,10 +77,12 @@ class AuthorOrStaffOrReadOnly(permissions.BasePermission):
 
     @RestrictAnonymousUser
     def has_object_permission(self, request, view, obj):
-        stuff = (request.user.is_moderator
-                 or request.user.is_admin
-                 or request.user.is_superuser)
-        return (obj.author == request.user or stuff)
+        stuff = (request.user.is_authenticated
+                 and (request.user.is_moderator
+                      or request.user.is_admin
+                      or request.user.is_superuser))
+        return (request.method in permissions.SAFE_METHODS
+                or (obj.author == request.user or stuff))
 
 
 class AdminOrReadOnly(permissions.BasePermission):
@@ -92,6 +94,15 @@ class AdminOrReadOnly(permissions.BasePermission):
                 or (request.user.is_authenticated
                     and (request.user.is_admin
                          or request.user.is_superuser)))
+
+    @RestrictAnonymousUser
+    def has_object_permission(self, request, view, obj):
+        stuff = (request.user.is_authenticated
+                 and (request.user.is_moderator
+                      or request.user.is_admin
+                      or request.user.is_superuser))
+        return (request.method in permissions.SAFE_METHODS
+                or stuff)
 
 
 class IsAdmin(permissions.BasePermission):
