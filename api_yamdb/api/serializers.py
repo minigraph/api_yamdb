@@ -65,10 +65,11 @@ class TitleSerializer(serializers.ModelSerializer):
     # вернуть список словарей с полями name и slug
     # используем SerializerMethodField:
     genre = serializers.SerializerMethodField()
-    category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(),
-        slug_field='slug',
-    )
+    category = serializers.SerializerMethodField()
+    # category = serializers.SlugRelatedField(
+    #     queryset=Category.objects.all(),
+    #     slug_field='slug',
+    # )
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
@@ -84,27 +85,40 @@ class TitleSerializer(serializers.ModelSerializer):
 
         # сразу создаем запись title, т.к. жанров нет в validated_data
         title = Title.objects.create(**validated_data)
-        if 'genre' not in self.initial_data:
-            return title
-        if len(self.initial_data['genre']) == 0:
-            return title
-        for genre_slug in self.initial_data['genre']:
-            current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-            title.genre.add(current_genre)
+        if 'genre' in self.initial_data:
+            for genre_slug in self.initial_data['genre']:
+                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
+                title.genre.add(current_genre)
+
+        if 'category' in self.initial_data:
+            category = Category.objects.filter(
+                slug=self.initial_data['category']
+            ).get()
+            if category:
+                title.category = category
         title.save()
         return title
 
     def update(self, instance, validated_data):
 
+        instance.name = validated_data.get('name')
+        instance.year = validated_data.get('year')
+
         # пришли новые жанры, очищаем старые
         if 'genre' in self.initial_data:
             instance.genre.clear()
 
-        if len(self.initial_data['genre']) == 0:
-            return instance
-        for genre_slug in self.initial_data['genre']:
-            current_genre = get_object_or_404(Genre, slug=genre_slug)
-            instance.genre.add(current_genre)
+        if 'genre' in self.initial_data:
+            for genre_slug in self.initial_data['genre']:
+                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
+                instance.genre.add(current_genre)
+
+        if 'category' in self.initial_data:
+            category = Category.objects.filter(
+                slug=self.initial_data['category']
+            ).get()
+            if category:
+                instance.category = category
         instance.save()
         return instance
 
@@ -115,9 +129,12 @@ class TitleSerializer(serializers.ModelSerializer):
             )
         return year
 
+    def get_category(self, obj):
+        return {'name': obj.category.name, 'slug': obj.category.slug}
+
     def get_genre(self, obj):
-        title = Title.objects.get(pk=obj.pk)
-        genres_qs = title.genre.all()
+        # title = Title.objects.get(pk=obj.pk)
+        genres_qs = obj.genre.all()
         genres = []
         if len(genres_qs):
             for genre in genres_qs:
