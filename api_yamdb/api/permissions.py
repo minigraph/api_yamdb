@@ -19,6 +19,7 @@ def RestrictAnonymousUser(func):
 
     return has_permission
 
+
 class AuthorOrStaffOrReadOnly(permissions.BasePermission):
     """Авторизованный пользователь может изменять свой контент.
     Модератор и админ может изменять контент пользователя"""

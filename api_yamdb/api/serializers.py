@@ -64,12 +64,8 @@ class TitleSerializer(serializers.ModelSerializer):
     # с другой стороны при запросе GET необходимо
     # вернуть список словарей с полями name и slug
     # используем SerializerMethodField:
-    genre = serializers.SerializerMethodField()
+    genre = GenreSerializer(many=True, read_only=True)
     category = serializers.SerializerMethodField()
-    # category = serializers.SlugRelatedField(
-    #     queryset=Category.objects.all(),
-    #     slug_field='slug',
-    # )
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
@@ -83,13 +79,12 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        # сразу создаем запись title, т.к. жанров нет в validated_data
         title = Title.objects.create(**validated_data)
         if 'genre' in self.initial_data:
             data_genre = self.initial_data.getlist('genre', [])
             for genre_slug in data_genre:
                 current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-                title.genre.add(current_genre)
+                GenresOfTitles.objects.create(title=title, genre=current_genre)
 
         if 'category' in self.initial_data:
             category = Category.objects.filter(
@@ -106,7 +101,6 @@ class TitleSerializer(serializers.ModelSerializer):
         instance.year = validated_data.get('year')
 
         if 'genre' in self.initial_data:
-            # instance.genre.clear()
             for genre_slug in self.initial_data['genre']:
                 current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
                 instance.genre.add(current_genre)
@@ -172,7 +166,7 @@ class UserSerializer(serializers.ModelSerializer):
         'confirmation_code': {'write_only': True}
     }
 
-# Запрет на использование "me" в качестве username
+    # Запрет на использование "me" в качестве username
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(

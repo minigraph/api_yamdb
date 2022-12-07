@@ -61,9 +61,6 @@ class TitleViewSet(mixins.DestroyModelMixin,
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
-    def get_object(self):
-        return Title.objects.get(pk=self.kwargs['pk'])
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
