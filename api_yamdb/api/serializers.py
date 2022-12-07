@@ -1,11 +1,11 @@
 from datetime import datetime
 
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 from reviews.models import (Category, Comment, Genre, GenresOfTitles, Review,
                             Title)
 from users.models import CustomUser
-from django.db.models import Avg
 
 
 class CategorySerializer(serializers.ModelSerializer):
