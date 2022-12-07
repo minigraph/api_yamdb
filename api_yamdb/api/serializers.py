@@ -105,11 +105,8 @@ class TitleSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name')
         instance.year = validated_data.get('year')
 
-        # пришли новые жанры, очищаем старые
         if 'genre' in self.initial_data:
-            instance.genre.clear()
-
-        if 'genre' in self.initial_data:
+            # instance.genre.clear()
             for genre_slug in self.initial_data['genre']:
                 current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
                 instance.genre.add(current_genre)
@@ -131,16 +128,14 @@ class TitleSerializer(serializers.ModelSerializer):
         return year
 
     def get_category(self, obj):
-        return {'name': obj.category.name, 'slug': obj.category.slug}
+        category_qs = obj.category
+        category_serializer = CategorySerializer(category_qs)
+        return category_serializer.data
 
     def get_genre(self, obj):
-        # title = Title.objects.get(pk=obj.pk)
         genres_qs = obj.genre.all()
-        genres = []
-        if len(genres_qs):
-            for genre in genres_qs:
-                genres.append({'name': genre.name, 'slug': genre.slug})
-        return genres
+        genre_serializer = GenreSerializer(genres_qs, many=True)
+        return genre_serializer.data
 
     def get_rating(self, obj):
         rating = obj.reviews.aggregate(result=Avg('score'))

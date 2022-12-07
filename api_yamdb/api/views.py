@@ -44,9 +44,10 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
+class TitleViewSet(mixins.DestroyModelMixin,
                    mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
     """Вьюсет произведений."""
 
     permission_classes = [
