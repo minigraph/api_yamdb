@@ -134,7 +134,6 @@ class TitleSerializer(serializers.ModelSerializer):
     def get_genre(self, obj):
         genres_qs = obj.genre.all()
         genre_serializer = GenreSerializer(genres_qs, many=True)
-        print(genre_serializer.data)
         return genre_serializer.data
 
     def get_rating(self, obj):
