@@ -48,9 +48,10 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
         return get_object_or_404(Genre, slug=self.kwargs['pk'])
 
 
-class TitleViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
+class TitleViewSet(mixins.DestroyModelMixin,
                    mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
     """Вьюсет произведений."""
 
     permission_classes = [
