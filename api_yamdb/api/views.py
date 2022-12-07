@@ -1,9 +1,7 @@
-from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, pagination, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +10,11 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
+from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
+from api.serializers import (CategorySerializer, GenreSerializer,
+                             TitleSerializer)
+
+from .filters import TitleFilter
 from .serializers import (CheckCodeSerializer, CommentSerializer,
                           ReviewSerializer, UserSerializer)
 
@@ -55,8 +58,8 @@ class TitleViewSet(mixins.DestroyModelMixin,
     ]
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('category', 'name', 'year')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_object(self):
         return Title.objects.get(pk=self.kwargs['pk'])
