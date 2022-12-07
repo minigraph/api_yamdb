@@ -3,7 +3,7 @@
 Перед Вами API проекта YaMDB (Ya Movie DataBase). Учебный проект Яндекс.Практикум.
 Проект ставит перед собой цели создания базы произведений и их рейтинг на основе оценки пользователей, по средствам отзывов, возможности комментаривать эти отзывы. Пользователя имеет возможность регистрации и внесения некоторых личных данных, публикации отзывов и присвоения оценки, просмотр чужих отзывов и написание комментариев к ним.
 Проект реализован через архитектуру SPA. В данной части проекта реализован backend приложения по средствам Django Rest Framework.
-Использовано:
+использовано:
 * Python v.3.7.5 (https://docs.python.org/3.7/)
 * Django v.2.2.16 (https://docs.djangoproject.com/en/2.2/)
 * DRF v.3.12.4 (https://www.django-rest-framework.org/community/release-notes/#312x-series)
@@ -57,7 +57,62 @@ python3 manage.py runserver
 
 ### Примеры запросов:
 #### Примеры Оксаны
+##### Получение данных своего профиля
+```
+GET http://127.0.0.1:8000/api/v1/users/me/
+```
+Результат запроса:
+```json
+{
+  "username": "Luen",
+  "email": "test@test.ru",
+  "first_name": "Luen",
+  "last_name": "",
+  "bio": "",
+  "role": "moderator"
+}
+```
 
+##### Получение списка всех пользователей с токеном модератора
+```
+http://127.0.0.1:8000/api/v1/users/
+```
+Результат запроса:
+```json
+{
+    "detail": "You do not have permission to perform this action."
+}
+```
+
+##### Получение списка всех пользователей с токеном администратора
+```
+http://127.0.0.1:8000/api/v1/users/
+```
+Результат запроса:
+```json
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "username": "admin",
+      "email": "admin@gmail.com",
+      "first_name": "Админ",
+      "last_name": "Админский",
+      "bio": "",
+      "role": "user"
+    },
+    {
+      "username": "Luen",
+      "email": "test@test.ru",
+      "first_name": "Luen",
+      "last_name": "",
+      "bio": "",
+      "role": "moderator"
+    },
+}
+```
 #### Примеры Андрея
 
 
