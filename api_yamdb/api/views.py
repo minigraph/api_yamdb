@@ -27,9 +27,7 @@ class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
-    def get_object(self):
-        return get_object_or_404(Category, slug=self.kwargs['pk'])
+    lookup_field = 'slug'
 
 
 class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
@@ -43,9 +41,7 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-
-    def get_object(self):
-        return get_object_or_404(Genre, slug=self.kwargs['pk'])
+    lookup_field = 'slug'
 
 
 class TitleViewSet(mixins.DestroyModelMixin,

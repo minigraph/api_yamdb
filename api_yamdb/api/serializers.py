@@ -86,7 +86,8 @@ class TitleSerializer(serializers.ModelSerializer):
         # сразу создаем запись title, т.к. жанров нет в validated_data
         title = Title.objects.create(**validated_data)
         if 'genre' in self.initial_data:
-            for genre_slug in self.initial_data['genre']:
+            data_genre = self.initial_data.getlist('genre', [])
+            for genre_slug in data_genre:
                 current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
                 title.genre.add(current_genre)
 
