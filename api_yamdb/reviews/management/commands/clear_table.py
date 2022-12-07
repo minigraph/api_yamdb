@@ -1,8 +1,9 @@
 import sqlite3
-from django.core.management.base import BaseCommand
 
-from users import models as user_models
+from django.core.management.base import BaseCommand
 from reviews import models as review_models
+from users import models as user_models
+
 
 class Command(BaseCommand):
     """

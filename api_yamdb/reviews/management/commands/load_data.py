@@ -1,9 +1,9 @@
 import os
-from django.core.management.base import BaseCommand, CommandError
-from reviews.models import Title, Genre, Category
-from django.conf import settings
 
 import api.serializers as api_serializers
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
+from reviews.models import Category, Genre, Title
 
 
 class Command(BaseCommand):
