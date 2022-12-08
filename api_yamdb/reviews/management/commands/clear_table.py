@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     """
-    Use: 
+    Use:
         python manage.py clear_table tablename <table name>
     For delete all tables use:
         python manage.py clear_table tablename all

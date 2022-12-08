@@ -82,13 +82,14 @@ class Command(BaseCommand):
             file_path = class_params['file_path']
 
             with open(file_path, encoding="utf-8") as csv_file:
-                file_data = list(csv.DictReader(csv_file))
-                serializer = klass(data=file_data, many=True)
-                if serializer.is_valid():
-                    try:
+                try:
+                    file_data = list(csv.DictReader(csv_file))
+                    serializer = klass(data=file_data, many=True)
+                    if serializer.is_valid():
                         serializer.save()
-                    except Exception as e:
-                        self.err = True
-                        print('error while data loading: ', e)
-                else:
-                    print('validated_data', serializer.validated_data)
+                    else:
+                        pass
+                except Exception as e:
+                    self.err = True
+                    print('error while data loading, see below:\n ', e)
+                    raise
