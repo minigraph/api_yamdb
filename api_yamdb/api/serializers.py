@@ -65,7 +65,7 @@ class TitleSerializer(serializers.ModelSerializer):
     # вернуть список словарей с полями name и slug
     # используем SerializerMethodField:
     genre = GenreSerializer(many=True, read_only=True)
-    category = serializers.SerializerMethodField()
+    category = CategorySerializer(read_only=True)
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
@@ -120,16 +120,6 @@ class TitleSerializer(serializers.ModelSerializer):
                 'Год не может быть больше текущего!'
             )
         return year
-
-    def get_category(self, obj):
-        category_qs = obj.category
-        category_serializer = CategorySerializer(category_qs)
-        return category_serializer.data
-
-    def get_genre(self, obj):
-        genres_qs = obj.genre.all()
-        genre_serializer = GenreSerializer(genres_qs, many=True)
-        return genre_serializer.data
 
     def get_rating(self, obj):
         rating = obj.reviews.aggregate(result=Avg('score'))

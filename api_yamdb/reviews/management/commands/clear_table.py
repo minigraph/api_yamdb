@@ -1,13 +1,11 @@
 import sqlite3
 
 from django.core.management.base import BaseCommand
-from reviews import models as review_models
-from users import models as user_models
 
 
 class Command(BaseCommand):
     """
-    Use: 
+    Use:
         python manage.py clear_table tablename <table name>
     For delete all tables use:
         python manage.py clear_table tablename all
@@ -21,20 +19,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-
         if not options['arguments']:
             return
         if options['arguments'][0] == 'help':
             print(__class__.__doc__)
             return
-
-        # tables = [('reviews_' + item).casefold() for item in dir(review_models) 
-        # if not item.startswith('__') and not item.startswith('_') and callable(getattr(review_models, item))]
-        # tables2 = [('users_' + item).casefold() for item in dir(user_models) 
-        #             if not item.startswith('__') and not item.startswith('_') and callable(getattr(user_models, item))]
-        # tables += tables2
-        # print(tables)
-        # return
 
         if options['arguments'][0] == 'tablename':
             if options['arguments'][1] == 'all':
@@ -48,7 +37,7 @@ class Command(BaseCommand):
                     'users_customuser',
                 ]
             else:
-                table = [options['arguments'][1],]
+                table = [options['arguments'][1], ]
 
             for table in tables:
                 self.tablename = table
