@@ -2,8 +2,7 @@ import os
 
 import api.serializers as api_serializers
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from reviews.models import Category, Genre, Title
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -23,33 +22,33 @@ class Command(BaseCommand):
         parameters = {
             'UserSerializer':
                 {
-                 'class': api_serializers.UserSerializer,
-                 'file_name': 'users.csv',
+                    'class': api_serializers.UserSerializer,
+                    'file_name': 'users.csv',
                 },
             'CategorySerializer':
                 {
-                 'class': api_serializers.CategorySerializer,
-                 'file_name': 'category.csv',
+                    'class': api_serializers.CategorySerializer,
+                    'file_name': 'category.csv',
                 },
             'GenreSerializer':
                 {
-                 'class': api_serializers.GenreSerializer,
-                 'file_name': 'genre.csv',
+                    'class': api_serializers.GenreSerializer,
+                    'file_name': 'genre.csv',
                 },
             'TitleSerializer':
                 {
-                 'class': api_serializers.TitleSerializer,
-                 'file_name': 'titles.csv',
+                    'class': api_serializers.TitleSerializer,
+                    'file_name': 'titles.csv',
                 },
             'GenresOfTitlesSerializer':
                 {
-                 'class': api_serializers.GenresOfTitlesSerializer,
-                 'file_name': 'genre_title.csv',
+                    'class': api_serializers.GenresOfTitlesSerializer,
+                    'file_name': 'genre_title.csv',
                 },
             'ReviewSerializer':
                 {
-                 'class': api_serializers.ReviewSerializer,
-                 'file_name': 'review.csv',
+                    'class': api_serializers.ReviewSerializer,
+                    'file_name': 'review.csv',
                 },
         }
 
