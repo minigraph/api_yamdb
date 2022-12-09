@@ -12,7 +12,7 @@ from users.models import CustomUser
 
 from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
 from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer)
+                             TitleSerializer, TitleReadSerializer)
 
 from .filters import TitleFilter
 from .serializers import (CheckCodeSerializer, CommentSerializer,
@@ -29,7 +29,6 @@ class CreateDeleteListViewSet(
 
 
 class CategoryViewSet(CreateDeleteListViewSet):
-    """Вьюсет категорий."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -42,7 +41,6 @@ class CategoryViewSet(CreateDeleteListViewSet):
 
 
 class GenreViewSet(CreateDeleteListViewSet):
-    """Вьюсет жанров произведений."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -55,7 +53,6 @@ class GenreViewSet(CreateDeleteListViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Вьюсет произведений."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -64,6 +61,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleReadSerializer
+        else:
+            return TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
