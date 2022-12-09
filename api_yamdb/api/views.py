@@ -3,18 +3,17 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, pagination, status, viewsets
-from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
-
-from .filters import TitleFilter
-from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from .serializers import (CategorySerializer, CheckCodeSerializer,
-                          CommentSerializer, GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer)
+from v1.filters import TitleFilter
+from v1.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
+from v1.serializers import (CategorySerializer, CheckCodeSerializer,
+                            CommentSerializer, GenreSerializer,
+                            ReviewSerializer, TitleSerializer, UserSerializer)
 
 
 class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
@@ -59,6 +58,9 @@ class TitleViewSet(mixins.DestroyModelMixin,
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
+    def get_object(self):
+        return Title.objects.get(pk=self.kwargs['pk'])
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -66,8 +68,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     lookup_field = 'username'
 
-    # Создаёт эндпоинт "me" и позволяет работать со своим объектом
-    # и только авторизованному пользователю
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
@@ -107,6 +107,7 @@ def send_confirmation_code(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_jwt_token(request):
     """Получение и обновление токена"""
     serializer = CheckCodeSerializer(data=request.data)
