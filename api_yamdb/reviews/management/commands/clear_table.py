@@ -37,7 +37,7 @@ class Command(BaseCommand):
                     'users_customuser',
                 ]
             else:
-                table = [options['arguments'][1], ]
+               tables = [options['arguments'][1], ]
 
             for table in tables:
                 self.tablename = table

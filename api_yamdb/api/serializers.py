@@ -81,10 +81,19 @@ class TitleSerializer(serializers.ModelSerializer):
 
         title = Title.objects.create(**validated_data)
         if 'genre' in self.initial_data:
-            data_genre = self.initial_data.getlist('genre', [])
+            if isinstance(self.initial_data['genre'], list):
+                data_genre = self.initial_data['genre']
+            else:
+                data_genre = self.initial_data.getlist('genre', [])
+
             for genre_slug in data_genre:
-                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-                GenresOfTitles.objects.create(title=title, genre=current_genre)
+                try:
+                    current_genre = Genre.objects.get(slug=genre_slug)
+                    GenresOfTitles.objects.create(
+                        title=title, genre=current_genre
+                    )
+                except Genre.DoesNotExist:
+                    pass
 
         if 'category' in self.initial_data:
             category = Category.objects.filter(
@@ -101,9 +110,16 @@ class TitleSerializer(serializers.ModelSerializer):
         instance.year = validated_data.get('year')
 
         if 'genre' in self.initial_data:
-            for genre_slug in self.initial_data['genre']:
-                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-                instance.genre.add(current_genre)
+            if isinstance(self.initial_data['genre'], list):
+                data_genre = self.initial_data['genre']
+            else:
+                data_genre = self.initial_data.getlist('genre', [])
+            for genre_slug in data_genre:
+                try:
+                    current_genre = Genre.objects.get(slug=genre_slug)
+                    instance.genre.add(current_genre)
+                except Genre.DoesNotExist:
+                    pass
 
         if 'category' in self.initial_data:
             category = Category.objects.filter(
