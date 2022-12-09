@@ -54,7 +54,7 @@ class GenresOfTitlesSerializer(serializers.ModelSerializer):
         ]
 
 
-class mixin_title:
+class TitleMixin:
 
     def validate_year(self, year):
         if year > datetime.now().year:
@@ -70,7 +70,7 @@ class mixin_title:
         return int(rating['result'])
 
 
-class TitleReadSerializer(serializers.ModelSerializer, mixin_title):
+class TitleReadSerializer(serializers.ModelSerializer, TitleMixin):
 
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
@@ -86,7 +86,7 @@ class TitleReadSerializer(serializers.ModelSerializer, mixin_title):
         )
 
 
-class TitleSerializer(serializers.ModelSerializer, mixin_title):
+class TitleSerializer(serializers.ModelSerializer, TitleMixin):
 
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
