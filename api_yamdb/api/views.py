@@ -19,8 +19,16 @@ from .serializers import (CheckCodeSerializer, CommentSerializer,
                           ReviewSerializer, UserSerializer)
 
 
-class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                      mixins.CreateModelMixin, mixins.ListModelMixin):
+class CreateDeleteListViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(CreateDeleteListViewSet):
     """Вьюсет категорий."""
 
     permission_classes = [
@@ -33,8 +41,7 @@ class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin):
+class GenreViewSet(CreateDeleteListViewSet):
     """Вьюсет жанров произведений."""
 
     permission_classes = [
@@ -47,10 +54,7 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-                   viewsets.GenericViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет произведений."""
 
     permission_classes = [
