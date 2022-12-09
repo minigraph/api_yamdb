@@ -10,13 +10,11 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
-from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer)
-
+from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
+from .serializers import (CategorySerializer, GenreSerializer,
+                          TitleSerializer, CheckCodeSerializer,
+                          CommentSerializer, ReviewSerializer, UserSerializer)
 from .filters import TitleFilter
-from .serializers import (CheckCodeSerializer, CommentSerializer,
-                          ReviewSerializer, UserSerializer)
 
 
 class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
