@@ -85,6 +85,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def send_confirmation_code(request):
     """Отправляет код подтверждения на почту (в локальную папку)"""
     serializer = UserSerializer(data=request.data)
