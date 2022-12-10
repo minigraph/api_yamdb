@@ -2,8 +2,6 @@ from rest_framework import permissions
 
 
 class AuthorOrStaffOrReadOnly(permissions.BasePermission):
-    """Авторизованный пользователь может изменять свой контент.
-    Модератор и админ может изменять контент пользователя"""
 
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -19,7 +17,6 @@ class AuthorOrStaffOrReadOnly(permissions.BasePermission):
 
 
 class AdminOrReadOnly(permissions.BasePermission):
-    """Права администратора, для остальных только чтение"""
 
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -37,7 +34,6 @@ class AdminOrReadOnly(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
-    """Права только для администратора"""
 
     def has_permission(self, request, view):
         return (request.user.is_authenticated
