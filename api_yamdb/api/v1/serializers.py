@@ -63,7 +63,7 @@ class TitleMixin:
             )
         return year
 
-    def get_rating(self, obj):
+    def _get_rating(self, obj):
         rating = obj.reviews.aggregate(result=Avg('score'))
         if rating['result'] is None:
             return None
@@ -77,7 +77,7 @@ class TitleReadSerializer(serializers.ModelSerializer, TitleMixin):
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField(method_name='_get_rating')
 
     class Meta:
         model = Title
@@ -93,7 +93,7 @@ class TitleSerializer(serializers.ModelSerializer, TitleMixin):
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
-    rating = serializers.SerializerMethodField(method_name='get_rating')
+    rating = serializers.SerializerMethodField(method_name='_get_rating')
 
     class Meta:
         model = Title
