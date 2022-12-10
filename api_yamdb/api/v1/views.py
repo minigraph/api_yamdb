@@ -3,40 +3,23 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, pagination, status, viewsets
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import action, api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
-<<<<<<< HEAD
-
-from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer, TitleReadSerializer)
 
 from .filters import TitleFilter
-from .serializers import (CheckCodeSerializer, CommentSerializer,
-                          ReviewSerializer, UserSerializer)
-=======
-from v1.filters import TitleFilter
-from v1.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from v1.serializers import (CategorySerializer, CheckCodeSerializer,
-                            CommentSerializer, GenreSerializer,
-                            ReviewSerializer, TitleSerializer, UserSerializer)
->>>>>>> develop
+from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
+from .serializers import (CategorySerializer, CheckCodeSerializer,
+                          CommentSerializer, GenreSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
 
 
-class CreateDeleteListViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
-
-
-class CategoryViewSet(CreateDeleteListViewSet):
+class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
+                      mixins.CreateModelMixin, mixins.ListModelMixin):
+    """Вьюсет категорий."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -48,7 +31,9 @@ class CategoryViewSet(CreateDeleteListViewSet):
     lookup_field = 'slug'
 
 
-class GenreViewSet(CreateDeleteListViewSet):
+class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
+                   mixins.CreateModelMixin, mixins.ListModelMixin):
+    """Вьюсет жанров произведений."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -60,7 +45,11 @@ class GenreViewSet(CreateDeleteListViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(mixins.DestroyModelMixin,
+                   mixins.CreateModelMixin, mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
+    """Вьюсет произведений."""
 
     permission_classes = [
         AdminOrReadOnly,
@@ -70,17 +59,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
-<<<<<<< HEAD
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return TitleReadSerializer
-        else:
-            return TitleSerializer
-=======
-    def get_object(self):
-        return Title.objects.get(pk=self.kwargs['pk'])
->>>>>>> develop
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -88,6 +66,8 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     lookup_field = 'username'
 
+    # Создаёт эндпоинт "me" и позволяет работать со своим объектом
+    # и только авторизованному пользователю
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
@@ -105,7 +85,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def send_confirmation_code(request):
     """Отправляет код подтверждения на почту (в локальную папку)"""
     serializer = UserSerializer(data=request.data)
@@ -128,7 +107,6 @@ def send_confirmation_code(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def get_jwt_token(request):
     """Получение и обновление токена"""
     serializer = CheckCodeSerializer(data=request.data)
