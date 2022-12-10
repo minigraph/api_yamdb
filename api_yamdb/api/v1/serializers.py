@@ -148,7 +148,7 @@ class TitleSerializer(serializers.ModelSerializer, TitleMixin):
         if 'category' in self.initial_data:
             category = Category.objects.filter(
                 slug=self.initial_data['category']
-            ).get()
+            ).first()
             if category:
                 instance.category = category
         instance.save()
