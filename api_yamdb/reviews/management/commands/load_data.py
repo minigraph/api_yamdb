@@ -2,15 +2,11 @@ import logging
 import os
 import sys
 
-<<<<<<< HEAD
 from django.core.management.base import BaseCommand
-=======
-import api.v1.serializers as api_serializers
->>>>>>> develop
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-import api.serializers as api_serializers
+import api.v1.serializers as api_serializers
 
 
 logger = logging.getLogger(__name__)

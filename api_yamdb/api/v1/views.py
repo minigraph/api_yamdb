@@ -14,12 +14,19 @@ from .filters import TitleFilter
 from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
 from .serializers import (CategorySerializer, CheckCodeSerializer,
                           CommentSerializer, GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer)
+                          TitleSerializer, UserSerializer, TitleReadSerializer)
 
 
-class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                      mixins.CreateModelMixin, mixins.ListModelMixin):
-    """Вьюсет категорий."""
+class CreateDeleteListViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(CreateDeleteListViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -31,9 +38,7 @@ class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin):
-    """Вьюсет жанров произведений."""
+class GenreViewSet(CreateDeleteListViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -45,11 +50,7 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-                   viewsets.GenericViewSet):
-    """Вьюсет произведений."""
+class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -58,6 +59,12 @@ class TitleViewSet(mixins.DestroyModelMixin,
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleReadSerializer
+        else:
+            return TitleSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
