@@ -93,7 +93,7 @@ class TitleSerializer(serializers.ModelSerializer, TitleMixin):
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField(method_name='get_rating')
 
     class Meta:
         model = Title
