@@ -3,25 +3,30 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, pagination, status, viewsets
-from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
-from api.permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer)
-
 from .filters import TitleFilter
-from .serializers import (CheckCodeSerializer, CommentSerializer,
-                          ReviewSerializer, UserSerializer)
+from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
+from .serializers import (CategorySerializer, ConfirmationCodeSerializer,
+                          CommentSerializer, GenreSerializer, ReviewSerializer,
+                          TitleSerializer, TitleReadSerializer, UserSerializer)
 
 
-class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                      mixins.CreateModelMixin, mixins.ListModelMixin):
-    """Вьюсет категорий."""
+class CreateDeleteListViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(CreateDeleteListViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -33,9 +38,7 @@ class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin):
-    """Вьюсет жанров произведений."""
+class GenreViewSet(CreateDeleteListViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -47,11 +50,7 @@ class GenreViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(mixins.DestroyModelMixin,
-                   mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-                   viewsets.GenericViewSet):
-    """Вьюсет произведений."""
+class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = [
         AdminOrReadOnly,
@@ -61,6 +60,12 @@ class TitleViewSet(mixins.DestroyModelMixin,
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleReadSerializer
+        else:
+            return TitleSerializer
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -68,8 +73,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     lookup_field = 'username'
 
-    # Создаёт эндпоинт "me" и позволяет работать со своим объектом
-    # и только авторизованному пользователю
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
@@ -87,6 +90,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def send_confirmation_code(request):
     """Отправляет код подтверждения на почту (в локальную папку)"""
     serializer = UserSerializer(data=request.data)
@@ -109,9 +113,10 @@ def send_confirmation_code(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_jwt_token(request):
     """Получение и обновление токена"""
-    serializer = CheckCodeSerializer(data=request.data)
+    serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         CustomUser,

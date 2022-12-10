@@ -9,7 +9,6 @@ from users.models import CustomUser
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор категорий."""
 
     slug = serializers.SlugField(
         validators=[validators.UniqueValidator(
@@ -22,7 +21,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """Сериализатор жанров"""
 
     slug = serializers.SlugField(
         validators=[validators.UniqueValidator(
@@ -56,20 +54,46 @@ class GenresOfTitlesSerializer(serializers.ModelSerializer):
         ]
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор произведений."""
+class TitleMixin:
 
-    # при создании нового произведения передается список словарей жанров только
-    # с полем slug без имени, при этом нельзя создавать новые жанры
-    # с другой стороны при запросе GET необходимо
-    # вернуть список словарей с полями name и slug
-    # используем SerializerMethodField:
+    def validate_year(self, year):
+        if year > datetime.now().year:
+            raise serializers.ValidationError(
+                'Год не может быть больше текущего!'
+            )
+        return year
+
+    def _get_rating(self, obj):
+        rating = obj.reviews.aggregate(result=Avg('score'))
+        if rating['result'] is None:
+            return None
+        return int(rating['result'])
+
+
+class TitleReadSerializer(serializers.ModelSerializer, TitleMixin):
+
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     name = serializers.CharField(required=True)
     year = serializers.IntegerField(required=True)
     description = serializers.CharField(required=False)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField(method_name='_get_rating')
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'category', 'genre', 'name', 'description', 'year', 'rating'
+        )
+
+
+class TitleSerializer(serializers.ModelSerializer, TitleMixin):
+
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    name = serializers.CharField(required=True)
+    year = serializers.IntegerField(required=True)
+    description = serializers.CharField(required=False)
+    rating = serializers.SerializerMethodField(method_name='_get_rating')
 
     class Meta:
         model = Title
@@ -81,15 +105,24 @@ class TitleSerializer(serializers.ModelSerializer):
 
         title = Title.objects.create(**validated_data)
         if 'genre' in self.initial_data:
-            data_genre = self.initial_data.getlist('genre', [])
+            if isinstance(self.initial_data['genre'], list):
+                data_genre = self.initial_data['genre']
+            else:
+                data_genre = self.initial_data.getlist('genre', [])
+
             for genre_slug in data_genre:
-                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-                GenresOfTitles.objects.create(title=title, genre=current_genre)
+                try:
+                    current_genre = Genre.objects.get(slug=genre_slug)
+                    GenresOfTitles.objects.create(
+                        title=title, genre=current_genre
+                    )
+                except Genre.DoesNotExist:
+                    pass
 
         if 'category' in self.initial_data:
             category = Category.objects.filter(
                 slug=self.initial_data['category']
-            ).get()
+            ).first()
             if category:
                 title.category = category
         title.save()
@@ -101,31 +134,25 @@ class TitleSerializer(serializers.ModelSerializer):
         instance.year = validated_data.get('year')
 
         if 'genre' in self.initial_data:
-            for genre_slug in self.initial_data['genre']:
-                current_genre, _ = Genre.objects.get_or_create(slug=genre_slug)
-                instance.genre.add(current_genre)
+            if isinstance(self.initial_data['genre'], list):
+                data_genre = self.initial_data['genre']
+            else:
+                data_genre = self.initial_data.getlist('genre', [])
+            for genre_slug in data_genre:
+                try:
+                    current_genre = Genre.objects.get(slug=genre_slug)
+                    instance.genre.add(current_genre)
+                except Genre.DoesNotExist:
+                    pass
 
         if 'category' in self.initial_data:
             category = Category.objects.filter(
                 slug=self.initial_data['category']
-            ).get()
+            ).first()
             if category:
                 instance.category = category
         instance.save()
         return instance
-
-    def validate_year(self, year):
-        if year > datetime.now().year:
-            raise serializers.ValidationError(
-                'Год не может быть больше текущего!'
-            )
-        return year
-
-    def get_rating(self, obj):
-        rating = obj.reviews.aggregate(result=Avg('score'))
-        if rating['result'] is None:
-            return None
-        return int(rating['result'])
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -156,7 +183,6 @@ class UserSerializer(serializers.ModelSerializer):
         'confirmation_code': {'write_only': True}
     }
 
-    # Запрет на использование "me" в качестве username
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
@@ -164,7 +190,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
-class CheckCodeSerializer(serializers.Serializer):
+class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.SlugField(required=True)
     confirmation_code = serializers.CharField(required=True)
 

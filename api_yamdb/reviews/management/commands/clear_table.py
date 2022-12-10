@@ -1,6 +1,11 @@
 import sqlite3
+import logging
+import os
+import sys
 
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -14,15 +19,21 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        # Positional arguments
+
         parser.add_argument('arguments', nargs='+', type=str)
 
     def handle(self, *args, **options):
 
+        initialize_logger()
+
         if not options['arguments']:
             return
         if options['arguments'][0] == 'help':
-            print(__class__.__doc__)
+            log_params = {__class__.__doc__}
+            logger.info(
+                'Справка по функции: '
+                f'{log_params} '
+            )
             return
 
         if options['arguments'][0] == 'tablename':
@@ -37,15 +48,15 @@ class Command(BaseCommand):
                     'users_customuser',
                 ]
             else:
-                table = [options['arguments'][1], ]
+                tables = [options['arguments'][1], ]
 
             for table in tables:
                 self.tablename = table
                 self.clear_table()
-                print(f'table {self.tablename} is cleared')
+                logger.info(f'table {self.tablename} is cleared')
             return
         else:
-            print(__class__.__doc__)
+            logger.info(__class__.__doc__)
 
     def clear_table(self):
         table = self.tablename
@@ -62,3 +73,33 @@ class Command(BaseCommand):
         cn.commit()
         cur.close()
         cn.close()
+
+
+def initialize_logger():
+    """
+    Инициализурует логгер модуля приложения.
+    """
+
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    file_handler = logging.FileHandler(
+        filename=os.path.join(file_dir, 'main.log'),
+        encoding='utf-8',
+    )
+    message_format = (
+        '%(asctime)s : %(levelname)s'
+        ' : %(name)s : LN=%(lineno)d'
+        ' : pathname=%(pathname)s : %(message)s'
+    )
+    stdout_handler = logging.StreamHandler(stream=sys.stdout,)
+    handlers = [file_handler, stdout_handler]
+    formatter = logging.Formatter(
+        message_format,
+        '%Y-%m-%d %H:%M:%S'
+    )
+    file_handler.setFormatter(formatter)
+    stdout_handler.setFormatter(formatter)
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=handlers,
+        format=message_format,
+    )

@@ -1,4 +1,8 @@
+from django.core import validators
 from django.db import models
+from django.core.validators import RegexValidator
+
+
 from users.models import CustomUser
 
 
@@ -15,13 +19,19 @@ class Category(models.Model):
         'Адрес',
         unique=True,
         max_length=50,
-        help_text='Адрес категории'
+        help_text='Адрес категории',
+        validators=[
+            RegexValidator(
+                r'[-\w]+',
+                'Недопустимые символы в адресе!'
+            ),
+        ]
     )
 
     class Meta:
         verbose_name = 'Категория произведения'
         verbose_name_plural = 'Категории произведений'
-        ordering = ['slug', ]
+        ordering = ('slug', )
 
     def __str__(self):
         return self.name
@@ -40,13 +50,19 @@ class Genre(models.Model):
         'Адрес',
         unique=True,
         max_length=50,
-        help_text='Адрес жанра'
+        help_text='Адрес жанра',
+        validators=[
+            RegexValidator(
+                r'[-\w]+',
+                'Недопустимые символы в адресе!'
+            ),
+        ]
     )
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-        ordering = ['slug', ]
+        ordering = ('slug', )
 
     def __str__(self):
         return self.name
@@ -90,7 +106,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
-        ordering = ['name', ]
+        ordering = ('name', )
 
     def __str__(self):
         return self.name
@@ -116,10 +132,10 @@ class GenresOfTitles(models.Model):
     class Meta:
         verbose_name = 'Жанр произведения'
         verbose_name_plural = 'Жанры произведения'
-        ordering = ['title', 'genre']
+        ordering = ('title', 'genre')
 
         constraints = models.UniqueConstraint(
-            fields=['title', 'genre'],
+            fields=('title', 'genre'),
             name='title_genre',
         ),
 
@@ -137,9 +153,13 @@ class Review(models.Model):
         'Дата публикации',
         auto_now_add=True
     )
-    score = models.IntegerField(
+    score = models.PositiveIntegerField(
         'Оценка',
-        help_text='Оценка произведения'
+        help_text='Оценка произведения',
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(10)
+        ]
     )
     text = models.TextField(
         'Текст',
@@ -156,10 +176,10 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['pub_date', ]
+        ordering = ('pub_date', )
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title'],
+                fields=('author', 'title'),
                 name='unique_review'
             )
         ]
@@ -193,7 +213,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['pub_date', ]
+        ordering = ('pub_date', )
 
     def __str__(self):
         return self.text

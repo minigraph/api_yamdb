@@ -234,6 +234,132 @@ Status code: 404
 }
 ```
 
+##### Запрос получения списка произведений:
+```
+GET http://127.0.0.1:8000/api/v1/titles/
+```
+Ответ:
+```
+Status code: 200
+```
+```json
+{
+    "count": 32,
+    "next": "http://127.0.0.1:8000/api/v1/titles/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 195,
+            "category": {
+                "name": "",
+                "slug": ""
+            },
+            "genre": [],
+            "name": "12 разгневанных мужчин",
+            "description": "",
+            "year": 1957,
+            "rating": null
+        },
+        {
+            "id": 222,
+            "category": {
+                "name": "",
+                "slug": ""
+            },
+            "genre": [],
+            "name": "Deep Purple — Smoke on the Water",
+            "description": "",
+            "year": 1971,
+            "rating": null
+        },
+        {
+            "id": 221,
+            "category": {
+                "name": "",
+                "slug": ""
+            },
+            "genre": [],
+            "name": "Elvis Presley - Blue Suede Shoes",
+            "description": "",
+            "year": 1955,
+            "rating": null
+        },
+        {
+            "id": 211,
+            "category": {
+                "name": "",
+                "slug": ""
+            },
+            "genre": [],
+            "name": "Generation П",
+            "description": "",
+            "year": 2011,
+            "rating": null
+        },
+        {
+            "id": 216,
+            "category": {
+                "name": "",
+                "slug": ""
+            },
+            "genre": [],
+            "name": "Generation П",
+            "description": "",
+            "year": 1999,
+            "rating": null
+        }
+    ]
+}
+```
+
+##### Запрос на добавление произведения:
+```
+POST http://127.0.0.1:8000/api/v1/titles/
+```
+Данные:
+```json
+{
+    "name" : "Автостопом по галактике",
+    "year" : 2005,
+    "description": "После гибели Земли два друга летят в космическое путешествие. Мартин Фриман в экранизации книги Дугласа Адамса",
+    "genre" : [
+       "comedy",
+       "detective"
+        ],
+    "category" : "movie"
+}
+```
+Ответы:
+```
+Status code: 200
+```
+```json
+{
+    "id": 334,
+    "category": {
+        "name": "Фильм",
+        "slug": "movie"
+    },
+    "genre": [
+        {
+            "name": "Комедия",
+            "slug": "comedy"
+        },
+        {
+            "name": "Детектив",
+            "slug": "detective"
+        }
+    ],
+    "name": "Автостопом по галактике",
+    "description": "После гибели Земли два друга летят в космическое путешествие. Мартин Фриман в экранизации книги Дугласа Адамса",
+    "year": 2005,
+    "rating": null
+}
+```
+
+
+
+
 Подробная инструкция после установки и запуска проекта по адресу:
 [Документация ReDoc](http://127.0.0.1:8000/redoc/)
 
