@@ -3,8 +3,8 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, pagination, status, viewsets
-from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
@@ -12,9 +12,9 @@ from users.models import CustomUser
 
 from .filters import TitleFilter
 from .permissions import AdminOrReadOnly, AuthorOrStaffOrReadOnly, IsAdmin
-from .serializers import (CategorySerializer, CheckCodeSerializer,
-                          CommentSerializer, GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          ConfirmationCodeSerializer, GenreSerializer,
+                          ReviewSerializer, TitleSerializer, UserSerializer)
 
 
 class CategoryViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,
@@ -66,8 +66,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     lookup_field = 'username'
 
-    # Создаёт эндпоинт "me" и позволяет работать со своим объектом
-    # и только авторизованному пользователю
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
@@ -85,6 +83,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def send_confirmation_code(request):
     """Отправляет код подтверждения на почту (в локальную папку)"""
     serializer = UserSerializer(data=request.data)
@@ -107,9 +106,10 @@ def send_confirmation_code(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_jwt_token(request):
     """Получение и обновление токена"""
-    serializer = CheckCodeSerializer(data=request.data)
+    serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         CustomUser,

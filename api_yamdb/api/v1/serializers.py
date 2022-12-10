@@ -172,7 +172,6 @@ class UserSerializer(serializers.ModelSerializer):
         'confirmation_code': {'write_only': True}
     }
 
-    # Запрет на использование "me" в качестве username
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
@@ -180,7 +179,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
-class CheckCodeSerializer(serializers.Serializer):
+class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.SlugField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
