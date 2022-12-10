@@ -1,5 +1,8 @@
 from django.core import validators
 from django.db import models
+from django.core.validators import RegexValidator
+
+
 from users.models import CustomUser
 
 
@@ -16,7 +19,13 @@ class Category(models.Model):
         'Адрес',
         unique=True,
         max_length=50,
-        help_text='Адрес категории'
+        help_text='Адрес категории',
+        validators=[
+            RegexValidator(
+                r'[-\w]+',
+                'Недопустимые символы в адресе!'
+            ),
+        ]
     )
 
     class Meta:
@@ -41,7 +50,13 @@ class Genre(models.Model):
         'Адрес',
         unique=True,
         max_length=50,
-        help_text='Адрес жанра'
+        help_text='Адрес жанра',
+        validators=[
+            RegexValidator(
+                r'[-\w]+',
+                'Недопустимые символы в адресе!'
+            ),
+        ]
     )
 
     class Meta:
